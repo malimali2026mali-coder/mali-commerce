@@ -1,15 +1,6 @@
 import { useMemo, useState } from 'react';
 
-const categories = [
-  'Tous',
-  'Électronique',
-  'Mode',
-  'Maison',
-  'Beauté',
-  'Automobile',
-  'Sport',
-  'Jouets',
-];
+const categories = ['Tous', 'Électronique', 'Mode', 'Maison', 'Beauté', 'Automobile', 'Sport', 'Jouets'];
 
 const products = [
   {
@@ -25,6 +16,9 @@ const products = [
     image:
       'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=900&q=80',
     seller: 'MaliTech',
+    description:
+      'Smartphone 5G avec écran AMOLED, appareil photo 64 MP, batterie longue durée et performance optimisée pour les usages quotidiens.',
+    stock: 'En stock',
   },
   {
     id: 2,
@@ -39,6 +33,9 @@ const products = [
     image:
       'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=900&q=80',
     seller: 'Bamako Home',
+    description:
+      'Coffret complet pour la cuisine moderne : pansements résistants, ustensiles premium et finition élégante pour un usage familial.',
+    stock: 'Stock limité',
   },
   {
     id: 3,
@@ -53,6 +50,9 @@ const products = [
     image:
       'https://images.unsplash.com/photo-1523170335258-f5ed11844a49?auto=format&fit=crop&w=900&q=80',
     seller: 'Fashion Mali',
+    description:
+      'Montre intelligente avec suivi du sommeil, fréquence cardiaque et notifications, pensée pour un mode de vie actif.',
+    stock: 'En stock',
   },
   {
     id: 4,
@@ -67,6 +67,9 @@ const products = [
     image:
       'https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&w=900&q=80',
     seller: 'AudioMali',
+    description:
+      'Casque ultra confortable avec son immersif, réduction de bruit active et autonomie d’écoute impressionnante.',
+    stock: 'Disponible',
   },
   {
     id: 5,
@@ -81,6 +84,9 @@ const products = [
     image:
       'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=900&q=80',
     seller: 'Mali Travel',
+    description:
+      'Sac robuste et spacieux, idéal pour les déplacements, avec compartiments utiles et matière résistante aux intempéries.',
+    stock: 'En stock',
   },
   {
     id: 6,
@@ -95,6 +101,9 @@ const products = [
     image:
       'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=900&q=80',
     seller: 'Maison D’or',
+    description:
+      'Lot premium pour préparer des boissons délicieuses et garder un esprit café de qualité à la maison.',
+    stock: 'Très demandé',
   },
   {
     id: 7,
@@ -109,6 +118,9 @@ const products = [
     image:
       'https://images.unsplash.com/photo-1541625602330-2277a4c46182?auto=format&fit=crop&w=900&q=80',
     seller: 'Bamako Cyclisme',
+    description:
+      'Vélo urbain léger, confortable et pratique pour les déplacements rapide dans la ville et autour de Bamako.',
+    stock: 'En stock',
   },
   {
     id: 8,
@@ -123,6 +135,9 @@ const products = [
     image:
       'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=900&q=80',
     seller: 'Mali Glow',
+    description:
+      'Routine beauté complète avec soins nutritionnels, hydratation intense et finition éclatante pour toute peau.',
+    stock: 'Stock limité',
   },
 ];
 
@@ -143,18 +158,51 @@ function formatPrice(value) {
 function App() {
   const [selectedCategory, setSelectedCategory] = useState('Tous');
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [cart, setCart] = useState([]);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [sortBy, setSortBy] = useState('popular');
 
   const filteredProducts = useMemo(() => {
-    return products.filter((product) => {
-      const matchesCategory =
-        selectedCategory === 'Tous' || product.category === selectedCategory;
-      const matchesSearch = product.name
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase());
-
+    const results = products.filter((product) => {
+      const matchesCategory = selectedCategory === 'Tous' || product.category === selectedCategory;
+      const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
       return matchesCategory && matchesSearch;
     });
-  }, [selectedCategory, searchTerm]);
+
+    if (sortBy === 'price-low') {
+      return [...results].sort((a, b) => a.price - b.price);
+    }
+
+    if (sortBy === 'price-high') {
+      return [...results].sort((a, b) => b.price - a.price);
+    }
+
+    if (sortBy === 'rating') {
+      return [...results].sort((a, b) => b.rating - a.rating);
+    }
+
+    return results;
+  }, [selectedCategory, searchTerm, sortBy]);
+
+  const addToCart = (product) => {
+    setCart((current) => {
+      const itemExists = current.find((item) => item.id === product.id);
+
+      if (itemExists) {
+        return current.map((item) =>
+          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item,
+        );
+      }
+
+      return [...current, { ...product, quantity: 1 }];
+    });
+    setIsCartOpen(true);
+  };
+
+  const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
+  const cartTotal = cart.reduce((total, item) => total + item.price * item.quantity, 0);
 
   return (
     <div className="app-shell">
@@ -177,8 +225,12 @@ function App() {
           </nav>
 
           <div className="nav-actions">
-            <button className="ghost-btn">Connexion</button>
-            <button className="primary-btn">Panier (0)</button>
+            <button className="ghost-btn" onClick={() => setIsAuthOpen(true)}>
+              Connexion
+            </button>
+            <button className="primary-btn" onClick={() => setIsCartOpen(true)}>
+              Panier ({cartCount})
+            </button>
           </div>
         </div>
       </header>
@@ -199,8 +251,7 @@ function App() {
             <span className="eyebrow">Boutique en ligne moderne</span>
             <h1>Des meilleures offres pour toute la famille.</h1>
             <p>
-              Découvrez des produits de qualité, des marques fiables et une expérience
-              d’achat rapide inspirée des meilleurs marchés e-commerce.
+              Découvrez des produits de qualité, des marques fiables et une expérience d’achat rapide inspirée des meilleurs marchés e-commerce.
             </p>
 
             <div className="hero-search">
@@ -262,16 +313,26 @@ function App() {
               <span className="eyebrow">Catalogue</span>
               <h2>Produits populaires</h2>
             </div>
-            <div className="filter-row">
-              {categories.map((category) => (
-                <button
-                  key={category}
-                  className={category === selectedCategory ? 'filter-chip active' : 'filter-chip'}
-                  onClick={() => setSelectedCategory(category)}
-                >
-                  {category}
-                </button>
-              ))}
+
+            <div className="controls-wrap">
+              <div className="filter-row">
+                {categories.map((category) => (
+                  <button
+                    key={category}
+                    className={category === selectedCategory ? 'filter-chip active' : 'filter-chip'}
+                    onClick={() => setSelectedCategory(category)}
+                  >
+                    {category}
+                  </button>
+                ))}
+              </div>
+
+              <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="sort-select">
+                <option value="popular">Les plus populaires</option>
+                <option value="price-low">Prix croissant</option>
+                <option value="price-high">Prix décroissant</option>
+                <option value="rating">Meilleures notes</option>
+              </select>
             </div>
           </div>
 
@@ -299,7 +360,14 @@ function App() {
 
                   <div className="shipping-row">{product.shipping}</div>
 
-                  <button className="product-btn">Ajouter au panier</button>
+                  <div className="product-actions">
+                    <button className="secondary-btn" onClick={() => setSelectedProduct(product)}>
+                      Détails
+                    </button>
+                    <button className="product-btn" onClick={() => addToCart(product)}>
+                      Ajouter
+                    </button>
+                  </div>
                 </div>
               </article>
             ))}
@@ -361,6 +429,113 @@ function App() {
           </div>
         </div>
       </footer>
+
+      {selectedProduct && (
+        <div className="modal-backdrop" onClick={() => setSelectedProduct(null)}>
+          <div className="product-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="close-modal" onClick={() => setSelectedProduct(null)}>
+              ×
+            </button>
+
+            <div className="modal-image-box">
+              <img src={selectedProduct.image} alt={selectedProduct.name} />
+            </div>
+
+            <div className="modal-content">
+              <span className="eyebrow">{selectedProduct.tag}</span>
+              <h3>{selectedProduct.name}</h3>
+              <div className="rating-row">
+                <span>★ {selectedProduct.rating}</span>
+                <small>({selectedProduct.reviews} avis)</small>
+              </div>
+
+              <div className="price-row big-price">
+                <strong>{formatPrice(selectedProduct.price)}</strong>
+                <span>{formatPrice(selectedProduct.oldPrice)}</span>
+              </div>
+
+              <p className="modal-description">{selectedProduct.description}</p>
+
+              <div className="modal-meta">
+                <span>Vendeur: {selectedProduct.seller}</span>
+                <span>État: {selectedProduct.stock}</span>
+              </div>
+
+              <div className="modal-actions">
+                <button className="secondary-btn" onClick={() => setSelectedProduct(null)}>
+                  Continuer
+                </button>
+                <button className="product-btn" onClick={() => addToCart(selectedProduct)}>
+                  Ajouter au panier
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <aside className={`cart-panel ${isCartOpen ? 'open' : ''}`}>
+        <div className="cart-header">
+          <h3>Mon panier</h3>
+          <button className="close-cart" onClick={() => setIsCartOpen(false)}>
+            ×
+          </button>
+        </div>
+
+        {cart.length === 0 ? (
+          <div className="cart-empty">
+            <p>Votre panier est vide.</p>
+            <button className="primary-btn" onClick={() => setIsCartOpen(false)}>
+              Continuer les achats
+            </button>
+          </div>
+        ) : (
+          <>
+            <div className="cart-items">
+              {cart.map((item) => (
+                <div className="cart-item" key={item.id}>
+                  <img src={item.image} alt={item.name} />
+                  <div className="cart-item-info">
+                    <strong>{item.name}</strong>
+                    <span>{item.quantity} × {formatPrice(item.price)}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="cart-footer">
+              <div className="cart-total-row">
+                <span>Total</span>
+                <strong>{formatPrice(cartTotal)}</strong>
+              </div>
+              <button className="primary-btn full-width">Valider la commande</button>
+            </div>
+          </>
+        )}
+      </aside>
+
+      <div className={`auth-panel ${isAuthOpen ? 'open' : ''}`}>
+        <div className="auth-header">
+          <h3>Connexion</h3>
+          <button className="close-cart" onClick={() => setIsAuthOpen(false)}>
+            ×
+          </button>
+        </div>
+
+        <form className="auth-form">
+          <label>
+            Email
+            <input type="email" placeholder="vous@example.com" />
+          </label>
+          <label>
+            Mot de passe
+            <input type="password" placeholder="••••••••" />
+          </label>
+          <button type="button" className="primary-btn full-width" onClick={() => setIsAuthOpen(false)}>
+            Se connecter
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
