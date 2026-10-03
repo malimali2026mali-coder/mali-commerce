@@ -1,29 +1,35 @@
-import React from 'react';
-import { Text, View, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
-
-const products = [
-  { id: '1', name: 'Smartphone Mali X Pro', price: '245 000 FCFA' },
-  { id: '2', name: 'Montre connectée Mali Fit', price: '98 000 FCFA' },
-  { id: '3', name: 'Sac à dos voyage', price: '54 000 FCFA' },
-];
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, SafeAreaView } from 'react-native';
 
 export default function App() {
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    fetch('http://localhost:5000/api/products')
+      .then((res) => res.json())
+      .then((data) => setProducts(data))
+      .catch(() => setProducts([
+        { id: 1, name: 'Smartphone Mali X Pro', price: 245000 },
+        { id: 2, name: 'Montre Mali Fit', price: 98000 },
+      ]));
+  }, []);
+
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Mali Commerce</Text>
       <Text style={styles.subtitle}>Boutique mobile • Bamako</Text>
 
       <FlatList
         data={products}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => String(item.id)}
         renderItem={({ item }) => (
           <TouchableOpacity style={styles.card}>
             <Text style={styles.name}>{item.name}</Text>
-            <Text style={styles.price}>{item.price}</Text>
+            <Text style={styles.price}>{item.price.toLocaleString('fr-FR')} FCFA</Text>
           </TouchableOpacity>
         )}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -31,7 +37,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff7f0',
-    paddingTop: 80,
+    paddingTop: 60,
     paddingHorizontal: 20,
   },
   title: {

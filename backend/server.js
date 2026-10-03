@@ -46,6 +46,15 @@ app.post('/api/orders', (req, res) => {
   });
 });
 
+app.get('/api/stats', (req, res) => {
+  res.json({
+    totalSales: 24500000,
+    orders: 1820,
+    customers: 980,
+    products: products.length,
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });

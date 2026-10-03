@@ -1,0 +1,32 @@
+import React from 'react';
+
+export default function AdminDashboard() {
+  return (
+    <div style={{ padding: 32, fontFamily: 'Arial, sans-serif', background: '#f3f4f6', minHeight: '100vh' }}>
+      <h1 style={{ fontSize: 32, marginBottom: 24 }}>Tableau de bord Mali Commerce</h1>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 20 }}>
+        <StatCard label="Ventes" value="24,5M FCFA" />
+        <StatCard label="Commandes" value="1 820" />
+        <StatCard label="Clients" value="980" />
+        <StatCard label="Produits" value="125" />
+      </div>
+      <div style={{ marginTop: 28, background: '#fff', borderRadius: 18, padding: 24 }}>
+        <h2>Dernières commandes</h2>
+        <ul>
+          <li>Commande #1042 – Smartphone Mali X Pro</li>
+          <li>Commande #1043 – Montre connectée Mali Fit</li>
+          <li>Commande #1044 – Sac à dos voyage</li>
+        </ul>
+      </div>
+    </div>
+  );
+}
+
+function StatCard({ label, value }) {
+  return (
+    <div style={{ background: '#fff', borderRadius: 18, padding: 20, boxShadow: '0 10px 30px rgba(0,0,0,0.04)' }}>
+      <div style={{ color: '#6b7280', fontSize: 14 }}>{label}</div>
+      <div style={{ marginTop: 10, fontSize: 28, fontWeight: 800, color: '#111827' }}>{value}</div>
+    </div>
+  );
+}
