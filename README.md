@@ -1,2 +1,17 @@
-# mali-commerce
-Mali Commerce - Plateforme e-commerce dynamique inspirée d'Alibaba avec site web et application mobile. Branding Mali/Bamako.
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Dependency directories
+node_modules/
+
+# Build output
+/dist/
+
+# Local env files
+.env
+.env.*
+
+# OS files
+.DS_Store
